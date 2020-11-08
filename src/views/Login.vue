@@ -30,7 +30,8 @@
     },
     methods: {
       submit() {
-        axios.post('https://medication-platform.azurewebsites.net/api/Authenticate/Login', this.user)
+        axios.defaults.baseURL = "https://medication-platform.azurewebsites.net";
+        axios.post('/api/Authenticate/Login', this.user)
              .then(result => {
                 localStorage.setItem('token', result.data.token);
                 localStorage.setItem('role', result.data.role);
