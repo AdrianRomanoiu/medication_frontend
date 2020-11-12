@@ -30,24 +30,27 @@
     },
     methods: {
       submit() {
-        axios.defaults.baseURL = "https://medication-platform.azurewebsites.net";
+        //axios.defaults.baseURL = "https://medication-platform.azurewebsites.net";
         axios.post('/api/Authenticate/Login', this.user)
              .then(result => {
                 localStorage.setItem('token', result.data.token);
                 localStorage.setItem('role', result.data.role);
+                localStorage.setItem('email', result.data.email);
 
-                this.$router.push('/doctor');
+                this.$router.push('/' + result.data.role);
              }).
-             catch(() => {
+             catch((err) => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('role');
+                localStorage.removeItem('email');
+                console.log(err);
              })
       }
       },
     beforeCreate() {
         if (localStorage.getItem('token') != null){
-          let role = '/' + localStorage.getItem('role');
-          this.$router.push(role);
+          let rolePage = '/' + localStorage.getItem('role');
+          this.$router.push(rolePage);
         }
     }
   }

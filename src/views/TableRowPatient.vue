@@ -5,10 +5,11 @@
     <td>{{ person.birthDate.substring(0, 10) }}</td>
     <td>{{ person.address }}</td>
     <td>{{ person.gender }}</td>
+    <td>{{ person.medicalRecord}}</td>
     <td>
-        <a href="#editModal" @click="emitPerson()" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+        <a href="#editModalP" @click="emitPerson()" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
         <a href="#" @click="remove()" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
-        <a href="#detailsModal" @click="emitGetPatients()" class="details" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Details">&#xE0ee;</i></a>
+        <a href="#detailsModalP" @click="emitPatientId()"  class="details" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Details">&#xE0ee;</i></a>
     </td>
 </tr>
 </template>
@@ -30,14 +31,14 @@
                         'Authorization': 'Bearer ' + localStorage.getItem('token'),
                     }
                 }
-                axios.post("api/Doctor/DeleteCaregiver", {'Id': this.person.id}, config)
+                axios.post("api/Doctor/DeletePatient", {'Id': this.person.id}, config)
                     .then(() => this.$emit('deletedPerson', this.person));
             },
             emitPerson() {
-                this.$emit('new-caregiver', this.person);
+                this.$emit('new-patient', this.person);
             },
-            emitGetPatients() {
-                this.$emit('getPatients', this.person);
+            emitPatientId() {
+                this.$emit('patientId', this.person.id);
             }
         }
     }

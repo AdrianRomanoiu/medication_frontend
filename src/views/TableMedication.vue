@@ -6,12 +6,12 @@
                     <div class="table-title">
                         <div class="row">
                             <div class="col-sm-6">
-                                <h2>Manage <b>Caregivers</b></h2>
+                                <h2>Manage <b>Medication</b></h2>
                             </div>
                             <div class="col-sm-6">
-                                <a href="#addModal" @click="generateGUID()" class="btn btn-success" data-toggle="modal">
+                                <a href="#addModalM" class="btn btn-success" data-toggle="modal">
                                    <i class="material-icons">&#xE147;</i> 
-                                   <span>Add New Caregiver</span>
+                                   <span>Add New Medication</span>
                                 </a>						
                             </div>
                         </div>
@@ -19,70 +19,46 @@
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Email</th>
                                 <th>Name</th>
-                                <th>Birthdate</th>
-                                <th>Address</th>
-                                <th>Gender</th>
+                                <th>Side effects</th>
+                                <th>Dosage</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <TableRow v-for="(person, index) in persons" 
+                            <TableRowMedication v-for="(medication, index) in medications" 
                                       :key=index 
-                                      :person="person"
-                                      @getPatients="getPatientsList"
-                                      @new-caregiver="showCaregiver"
-                                      @deletedPerson="deletePerson"></TableRow>
+                                      :medication="medication"
+                                      @new-medication="showMedication"
+                                      @deletedMedication="deleteMedication"></TableRowMedication>
                         </tbody>
                     </table>
                 </div>
             </div>        
         </div>
         <!-- Add Modal HTML -->
-        <div id="addModal" class="modal fade">
+        <div id="addModalM" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <p style="margin: auto;">{{ guid }}</p>
-                </div>
-            </div>
-        </div>
-        <!-- Edit Modal HTML -->
-        <div id="editModal" class="modal fade">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form @submit.stop.prevent="updateCaregiver()" method="post">
+                    <form @submit.stop.prevent="addMedication()" method="post">
                         <div class="modal-header">						
-                            <h4 class="modal-title">Edit Employee</h4>
+                            <h4 class="modal-title">Add Medication</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label class="myLabel">Email</label>
-                                <input type="email" v-model="newCaregiver.email">
-                            </div>
-                            <div class="form-group">
                                 <label class="myLabel">Name</label>
-                                <input type="text" v-model="newCaregiver.name">
+                                <input type="text" v-model="toAddMedication.name">
+                            </div>
+                            <div class="form-group">
+                                <label class="myLabel">Side effects</label>
+                                <input type="text" v-model="toAddMedication.sideEffects">
                             </div>
 
                             <div class="form-group">
-                                <label>Birthdate</label>
-                                <Datepicker class="datepicker" v-model="newCaregiver.birthdate"></Datepicker>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="myLabel">Address</label>
-                                <input type="text" v-model="newCaregiver.address" />
-                            </div>
-                            <div class="form-group">
-                                <label class="myLabel">Gender</label>
-                                <select class="browser-default custom-select" v-model="newCaregiver.gender">
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>					
+                                <label class="myLabel">Dosage</label>
+                                <input type="text" v-model="toAddMedication.dosage" />
+                            </div>				
                         </div>
                         <div class="modal-footer">
                             <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
@@ -92,134 +68,106 @@
                 </div>
             </div>
         </div>
-        <!-- Details Modal HTML -->
-        <div id="detailsModal" class="modal fade" @>
+        <!-- Edit Modal HTML -->
+        <div id="editModalM" class="modal fade">
             <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form @submit.stop.prevent="setCaregiverForPatients()" method="post">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(patient, index) in patients" :key="index">
-                                    <td>
-                                        <label class="form-checkbox">
-                                            <input type="checkbox" :value="patient.id" v-model="patientsSelected.patientIds">
-                                            <i class="form-icon"></i>
-                                        </label>
-                                    </td>
-                                    <td>{{patient.name}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="modal-content">
+                    <form @submit.stop.prevent="updateMedication()" method="post">
+                        <div class="modal-header">						
+                            <h4 class="modal-title">Edit Medication</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="myLabel">Name</label>
+                                <input type="name" v-model="newMedication.name">
+                            </div>
+                            <div class="form-group">
+                                <label class="myLabel">Side effects</label>
+                                <input type="text" v-model="newMedication.sideEffects">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="myLabel">Dosage</label>
+                                <input type="text" v-model="newMedication.dosage" />
+                            </div>				
+                        </div>
                         <div class="modal-footer">
                             <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
                             <input type="submit" class="btn btn-info" value="Save">
                         </div>
-                        </form>
-                    </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import Datepicker from 'vuejs-datepicker';
-    import TableRow from './TableRow.vue';
+    import TableRowMedication from './TableRowMedication.vue';
     import axios from 'axios';
 
     export default {
         data() {
             return {
-                patientsSelected: {
-                    caregiverId: '',
-                    patientIds: []
-                },
-                patients: [],
-                persons: [],
-                guid: '',
-                newCaregiver: {
-                    id: '',
-                    email: '',
+                medications: [],
+                newMedication: {
                     name: '',
-                    birthdate: '',
-                    address: '',
-                    gender: ''
+                    sideEffects: '',
+                    dosage: '',
+                },
+                toAddMedication: {
+                    name: '',
+                    sideEffects: '',
+                    dosage: '',
                 }
             }
         },
         components: {
-            TableRow,
-            Datepicker
+            TableRowMedication,
         },
         created () {
-            this.getCaregivers();
+            this.getMedication();
         },
         methods: {
-            getCaregivers(){
+            getMedication() {
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.get("api/Doctor/GetCaregivers", config)
-                    .then(result => (this.persons = result.data));
-                },
-            generateGUID: function() {
+                axios.get("api/Doctor/GetMedication", config)
+                    .then(result => (this.medications = result.data));
+            },
+            deleteMedication(medication) {
+                this.medications.splice(this.medications.indexOf(medication), 1)
+            },
+            showMedication(medication) {
+                this.newMedication = medication;
+            },
+            updateMedication() {
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.get("api/Doctor/CreateCaregiver", config)
-                     .then(result => (this.guid = result.data));
-            },
-            deletePerson(person) {
-                this.persons.splice(this.persons.indexOf(person), 1)
-            },
-            showCaregiver(person) {
-                console.log(person.name);
-                this.newCaregiver = person;
-            },
-            updateCaregiver() {
-                let config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                }
-                axios.post("api/Doctor/UpdateCaregiver", this.newCaregiver, config)
+                axios.post("api/Doctor/UpdateMedication", this.newMedication, config)
                      .then(result => console.log(result));
             },
-            getPatientsList(person) {
+            addMedication () {
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.get("api/Doctor/GetPatients", config)
-                     .then(result => { this.patients = result.data; 
-                                       this.patientsSelected.caregiverId = person.id; });
-            },
-            setCaregiverForPatients() {
-                let config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                }
-                axios.post("api/Doctor/AddPatientsToCaregiver", this.patientsSelected, config)
-                     .then(result => this.patients = result.data);
+                axios.post("api/Doctor/CreateMedication", this.toAddMedication, config)
+                     .then(() => this.getMedication());
             }
         },
     }
 </script>
 
 <style lang="scss" scoped>
-    .datepicker {
-        text-align: center;
-    }
 
     .myLabel {
         display: block;

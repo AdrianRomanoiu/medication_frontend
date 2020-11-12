@@ -6,12 +6,12 @@
                     <div class="table-title">
                         <div class="row">
                             <div class="col-sm-6">
-                                <h2>Manage <b>Caregivers</b></h2>
+                                <h2>Manage <b>Patients</b></h2>
                             </div>
                             <div class="col-sm-6">
-                                <a href="#addModal" @click="generateGUID()" class="btn btn-success" data-toggle="modal">
+                                <a href="#addModalP" @click="generateGUID()" class="btn btn-success" data-toggle="modal">
                                    <i class="material-icons">&#xE147;</i> 
-                                   <span>Add New Caregiver</span>
+                                   <span>Add New Patient</span>
                                 </a>						
                             </div>
                         </div>
@@ -24,23 +24,24 @@
                                 <th>Birthdate</th>
                                 <th>Address</th>
                                 <th>Gender</th>
+                                <th>Medical Record</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <TableRow v-for="(person, index) in persons" 
+                            <TableRowPatient v-for="(person, index) in persons" 
                                       :key=index 
                                       :person="person"
-                                      @getPatients="getPatientsList"
-                                      @new-caregiver="showCaregiver"
-                                      @deletedPerson="deletePerson"></TableRow>
+                                      @patientId="getMedications"
+                                      @new-patient="showPatient"
+                                      @deletedPerson="deletePerson"></TableRowPatient>
                         </tbody>
                     </table>
                 </div>
             </div>        
         </div>
         <!-- Add Modal HTML -->
-        <div id="addModal" class="modal fade">
+        <div id="addModalP" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <p style="margin: auto;">{{ guid }}</p>
@@ -48,36 +49,42 @@
             </div>
         </div>
         <!-- Edit Modal HTML -->
-        <div id="editModal" class="modal fade">
+        <div id="editModalP" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form @submit.stop.prevent="updateCaregiver()" method="post">
+                    <form @submit.stop.prevent="updatePatient()" method="post">
                         <div class="modal-header">						
-                            <h4 class="modal-title">Edit Employee</h4>
+                            <h4 class="modal-title">Edit Patient</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
                                 <label class="myLabel">Email</label>
-                                <input type="email" v-model="newCaregiver.email">
+                                <input type="email" v-model="newPatient.email">
                             </div>
                             <div class="form-group">
                                 <label class="myLabel">Name</label>
-                                <input type="text" v-model="newCaregiver.name">
+                                <input type="text" v-model="newPatient.name">
                             </div>
 
                             <div class="form-group">
                                 <label>Birthdate</label>
-                                <Datepicker class="datepicker" v-model="newCaregiver.birthdate"></Datepicker>
+                                <Datepicker class="datepicker" v-model="newPatient.birthdate"></Datepicker>
                             </div>
 
                             <div class="form-group">
                                 <label class="myLabel">Address</label>
-                                <input type="text" v-model="newCaregiver.address" />
+                                <input type="text" v-model="newPatient.address" />
                             </div>
+
+                            <div class="form-group">
+                                <label class="myLabel">MedicalRecord</label>
+                                <input type="text" v-model="newPatient.medicalRecord" />
+                            </div>
+
                             <div class="form-group">
                                 <label class="myLabel">Gender</label>
-                                <select class="browser-default custom-select" v-model="newCaregiver.gender">
+                                <select class="browser-default custom-select" v-model="newPatient.gender">
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                     <option value="other">Other</option>
@@ -93,10 +100,14 @@
             </div>
         </div>
         <!-- Details Modal HTML -->
-        <div id="detailsModal" class="modal fade" @>
+        <div id="detailsModalP" class="modal fade">
             <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form @submit.stop.prevent="setCaregiverForPatients()" method="post">
+                <div class="modal-content">
+                    <form @submit.stop.prevent="addMedicationPlan()" method="post">
+                        <div class="modal-header">						
+                            <h4 class="modal-title">Add Medication</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
@@ -104,23 +115,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(patient, index) in patients" :key="index">
+                                <tr v-for="(medication, index) in medications" :key="index">
                                     <td>
                                         <label class="form-checkbox">
-                                            <input type="checkbox" :value="patient.id" v-model="patientsSelected.patientIds">
+                                            <input type="checkbox" :value="medication.id" v-model="medicationsObj.medicationIds">
                                             <i class="form-icon"></i>
                                         </label>
                                     </td>
-                                    <td>{{patient.name}}</td>
+                                    <td>{{medication.name}}</td>
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Start date</label>
+                                <Datepicker class="datepicker" v-model="medicationsObj.startDate"></Datepicker>
+                            </div>
+
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <Datepicker class="datepicker" v-model="medicationsObj.endDate"></Datepicker>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="myLabel">Intake interval</label>
+                                <input type="text" v-model="medicationsObj.intakeInterval" />
+                            </div>				
+                        </div>
                         <div class="modal-footer">
                             <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
                             <input type="submit" class="btn btn-info" value="Save">
                         </div>
-                        </form>
-                    </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -128,89 +155,90 @@
 
 <script>
     import Datepicker from 'vuejs-datepicker';
-    import TableRow from './TableRow.vue';
+    import TableRowPatient from './TableRowPatient.vue';
     import axios from 'axios';
 
     export default {
         data() {
             return {
-                patientsSelected: {
-                    caregiverId: '',
-                    patientIds: []
+                medicationsObj: {
+                    selectedPatientId: '',
+                    medicationIds: [],
+                    startDate: '',
+                    endDate: '',
+                    intakeInterval: '',
                 },
-                patients: [],
+                medications: [],
                 persons: [],
                 guid: '',
-                newCaregiver: {
+                newPatient: {
                     id: '',
                     email: '',
                     name: '',
                     birthdate: '',
                     address: '',
-                    gender: ''
+                    gender: '',
+                    medicalRecord: ''
                 }
             }
         },
         components: {
-            TableRow,
+            TableRowPatient,
             Datepicker
         },
         created () {
-            this.getCaregivers();
+            let config = {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            }
+            axios.get("api/Doctor/GetPatients", config)
+                 .then(result => (this.persons = result.data));
         },
         methods: {
-            getCaregivers(){
-                let config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                }
-                axios.get("api/Doctor/GetCaregivers", config)
-                    .then(result => (this.persons = result.data));
-                },
             generateGUID: function() {
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.get("api/Doctor/CreateCaregiver", config)
+                axios.get("api/Doctor/CreatePatient", config)
                      .then(result => (this.guid = result.data));
             },
             deletePerson(person) {
                 this.persons.splice(this.persons.indexOf(person), 1)
             },
-            showCaregiver(person) {
-                console.log(person.name);
-                this.newCaregiver = person;
+            showPatient(person) {
+                this.newPatient = person;
             },
-            updateCaregiver() {
+            updatePatient() {
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.post("api/Doctor/UpdateCaregiver", this.newCaregiver, config)
+                axios.post("api/Doctor/UpdatePatient", this.newPatient, config)
                      .then(result => console.log(result));
             },
-            getPatientsList(person) {
+            getMedications(patientId) {
+                this.medicationsObj.selectedPatientId = patientId;
+
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.get("api/Doctor/GetPatients", config)
-                     .then(result => { this.patients = result.data; 
-                                       this.patientsSelected.caregiverId = person.id; });
+                axios.get("api/Doctor/GetMedication", config)
+                     .then(result => this.medications = result.data);
             },
-            setCaregiverForPatients() {
+            addMedicationPlan() {
                 let config = {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 }
-                axios.post("api/Doctor/AddPatientsToCaregiver", this.patientsSelected, config)
-                     .then(result => this.patients = result.data);
+                axios.post("api/Doctor/AddMedicationPlanForPatient", this.medicationsObj, config)
+                     .then(result => console.log(result));
             }
         },
     }

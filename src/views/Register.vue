@@ -29,7 +29,7 @@
               <option selected="selected">Select role</option>
               <option value="doctor">Doctor</option>
               <option value="caregiver">Caregiver</option>
-              <option value="patien">Patient</option>
+              <option value="patient">Patient</option>
             </select>
 
             <div v-show="isSelectedRoleNotDoctor">
@@ -88,9 +88,18 @@
         this.isSelectedRoleNotDoctor = true;
       },
       submit() {
+          if (this.user.Role.localeCompare('doctor') != 0 && this.user.Key == null){
+             return;
+          }
+
          axios
           .post("/api/Authenticate/Register", this.user)
-          .then(response => (this.info = response))
+          .then(response => {
+            this.info = response;
+
+            this.$router.push("/");
+          });
+
         }
       }
     }
