@@ -42,6 +42,7 @@
     import RowPatient from './RowPatient.vue';
     import Layout from './Layout.vue';
     import axios from 'axios';
+    axios.defaults.baseURL = "https://medication-platform.azurewebsites.net/";
 
     export default {
         data() {

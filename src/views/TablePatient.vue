@@ -157,6 +157,7 @@
     import Datepicker from 'vuejs-datepicker';
     import TableRowPatient from './TableRowPatient.vue';
     import axios from 'axios';
+    axios.defaults.baseURL = "https://medication-platform.azurewebsites.net/";
 
     export default {
         data() {

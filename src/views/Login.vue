@@ -18,6 +18,7 @@
 
 <script>
   import axios from 'axios';
+  axios.defaults.baseURL = "https://medication-platform.azurewebsites.net/";
 
   export default {
     data () {
@@ -30,7 +31,6 @@
     },
     methods: {
       submit() {
-        //axios.defaults.baseURL = "https://medication-platform.azurewebsites.net";
         axios.post('/api/Authenticate/Login', this.user)
              .then(result => {
                 localStorage.setItem('token', result.data.token);

@@ -15,6 +15,7 @@
 
 <script>
     import axios from 'axios';
+    axios.defaults.baseURL = "https://medication-platform.azurewebsites.net/";
 
     export default {
         props: {

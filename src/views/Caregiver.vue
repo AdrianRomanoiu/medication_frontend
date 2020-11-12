@@ -63,6 +63,7 @@
     import RowCaregiver from './RowCaregiver.vue';
     import Layout from './Layout.vue';
     import axios from 'axios';
+    axios.defaults.baseURL = "https://medication-platform.azurewebsites.net/";
 
     export default {
         data() {
@@ -85,6 +86,7 @@
                  .then(result => (this.persons = result.data));
         },
         methods: {
+            
             showPatient(person) {
                 this.newPatient = person;
             },
